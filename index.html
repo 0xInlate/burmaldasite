@@ -108,8 +108,11 @@
         .panel-items {
             display: flex;
             flex-direction: column;
-            gap: 1.8rem;
+            height: 100%;
             padding: 2rem 0.5rem;
+        }
+        .spacer {
+            flex-grow: 1;
         }
         .panel-item {
             display: flex;
@@ -309,32 +312,174 @@
             background: #7b2fcf;
             transform: scale(1.05);
         }
-@media (max-aspect-ratio: 4/3) {
-    .main-container {
-        margin-left: 70px;
-        padding: 1rem;
-    }
-    #dynamicWord {
-        font-size: 2.8rem;
-        letter-spacing: 3px;
-    }
-    .weather-card {
-        min-width: 240px;
-        padding: 0.8rem;
-    }
-    .weather-card p {
-        font-size: 0.75rem;
-    }
-    .tab-content {
-        padding: 1rem;
-    }
-    .eng-page h2 {
-        font-size: 1.5rem;
-    }
-    .eng-page p {
-        font-size: 0.85rem;
-    }
-}
+        /* Модальное окно профиля */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background: rgba(25, 10, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid #aa6eff;
+            box-shadow: 0 0 40px rgba(170, 110, 255, 0.4);
+            padding: 2rem;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.2s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 32px;
+            cursor: pointer;
+            color: #f0e6ff;
+            transition: 0.2s;
+        }
+        .modal-close:hover {
+            color: #ff80bf;
+            transform: scale(1.1);
+        }
+        .profile-avatar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .profile-avatar img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #aa6eff;
+            object-fit: cover;
+            background: #2a0a4a;
+        }
+        .profile-name {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #e2b0ff;
+        }
+        .profile-info {
+            margin: 1rem 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .profile-info p {
+            margin: 0.5rem 0;
+        }
+        .facts-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        .facts-list li {
+            margin: 0.8rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        .facts-list li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: #aa6eff;
+        }
+        /* Адаптация под 4:3 */
+        @media (max-aspect-ratio: 4/3) {
+            .main-container {
+                margin-left: 70px;
+                padding: 1rem;
+            }
+            #dynamicWord {
+                font-size: 2.8rem;
+                letter-spacing: 3px;
+            }
+            .weather-card {
+                min-width: 240px;
+                padding: 0.8rem;
+            }
+            .weather-card p {
+                font-size: 0.75rem;
+            }
+            .tab-content {
+                padding: 1rem;
+            }
+            .eng-page h2 {
+                font-size: 1.5rem;
+            }
+            .eng-page p {
+                font-size: 0.85rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .side-panel {
+                width: 60px;
+            }
+            .main-container {
+                margin-left: 60px;
+                padding: 1rem;
+            }
+            #dynamicWord {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+            }
+            .weather-card {
+                min-width: 220px;
+                padding: 0.7rem;
+            }
+            .weather-card p {
+                font-size: 0.7rem;
+            }
+            .tab-content {
+                padding: 1rem;
+            }
+            .eng-page h2 {
+                font-size: 1.3rem;
+            }
+            .eng-page p {
+                font-size: 0.8rem;
+            }
+            .page-btn {
+                padding: 0.4rem 1.2rem;
+                font-size: 1rem;
+            }
+            .home-cross {
+                top: 20px;
+                right: 20px;
+                font-size: 28px;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            .profile-avatar img {
+                width: 90px;
+                height: 90px;
+            }
+            .profile-name {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -354,6 +499,11 @@
             <div class="panel-icon">A</div>
             <div class="panel-text">АНГЛИЙСКИЙ</div>
         </div>
+        <div class="spacer"></div>
+        <div class="panel-item" id="profileBtn">
+            <div class="panel-icon">⦿</div>
+            <div class="panel-text">ПРОФИЛЬ</div>
+        </div>
     </div>
 </div>
 <div class="dim-overlay"></div>
@@ -370,7 +520,7 @@
     <div id="engContent" class="tab-content hidden">
         <div class="eng-pages">
             <div id="engPage1" class="eng-page">
-                <h2> Red Nose Day (UK)</h2>
+                <h2>Red Nose Day (UK)</h2>
                 <p><strong>Red Nose Day</strong> — крупнейший благотворительный телемарафон Великобритании, организованный <strong>Comic Relief</strong> в 1988 году. Проводится раз в два года (обычно в марте). Главный символ — красный нос, который надевают знаменитости и обычные люди.</p>
                 <h3>Традиции и формат</h3>
                 <p>Вечер юмора, музыки и трогательных историй на BBC. Звёзды комедии, певцы и актёры участвуют в скетчах, челленджах и прямых эфирах. Зрители жертвуют деньги через SMS, телефонные звонки и онлайн. За 30+ лет собрано более £1,5 миллиарда на помощь детям, бездомным, жертвам бедствий.</p>
@@ -378,7 +528,7 @@
                 <p>Red Nose Day объединяет нацию смехом и добротой. Каждый может купить красный нос в супермаркете — часть суммы идёт в фонд. Праздник доказывает, что благотворительность может быть весёлой и доступной каждому.</p>
             </div>
             <div id="engPage2" class="eng-page hidden-page">
-                <h2> Российский аналог: «Добрая Воля»</h2>
+                <h2>Российский аналог: «Добрая Воля»</h2>
                 <p><strong>«Добрая Воля»</strong> — всероссийский благотворительный фестиваль, который проводится в нескольких городах России (Москва, Санкт-Петербург, Казань, Екатеринбург и др.). Организаторы вдохновлялись идеей Red Nose Day: объединить развлечение и помощь нуждающимся.</p>
                 <h3>Формат и отличия</h3>
                 <p>В отличие от британского телемарафона, «Добрая Воля» делает упор на уличные фестивали, концерты местных групп, ярмарки hand-made и лекции о благотворительности. Сбор средств идёт через волонтёрские кружки, продажу сувениров и краудфандинг. Средства направляются в детские дома, хосписы, приюты для животных.</p>
@@ -389,6 +539,31 @@
         <div class="page-buttons">
             <div class="page-btn" id="page1Btn">1</div>
             <div class="page-btn" id="page2Btn">2</div>
+        </div>
+    </div>
+</div>
+ 
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-close" id="modalCloseBtn">✕</div>
+        <div class="profile-avatar">
+            <img src="assets/image/ava.png" alt="avatar" onerror="this.src='https://via.placeholder.com/120?text=0x'">
+        </div>
+        <div class="profile-name">0xInlate</div>
+        <div class="profile-info">
+            <p><strong>Работа над проектом:</strong> 9–16 апреля 2026 (сикс-севен дней)</p>
+            <p><strong>Роль:</strong> веб разраб, дизайнер, ну и там еще че то</p>
+            <p><strong>Интересные факты:</strong></p>
+            <ul class="facts-list">
+                <li>за время создания сайта я выпил 5 литров чая</li>
+                <li>за время создания я прослушал весь свой плейлист...</li>
+                <li>я буду обновлять сайт, так что не потеряйте его</li>
+                <li>хост на картошке</li>
+                <li>сус вылазь там радиация</li>
+                <li>я уже красный</li>
+                <li>а вы знали что github pages платный?</li>
+                <li>бобр курва я пердоле</li>
+            </ul>
         </div>
     </div>
 </div>
@@ -413,14 +588,14 @@
             card.className = 'weather-card';
             card.innerHTML = `
                 <h3>${day.date}</h3>
-                <p><span class="label"> Температура днём:</span><span class="value">${day.tempDay}°C</span></p>
-                <p><span class="label"> Температура ночью:</span><span class="value">${day.tempNight}°C</span></p>
-                <p><span class="label"> Давление:</span><span class="value">${day.pressure} мм</span></p>
-                <p><span class="label"> Направление ветра:</span><span class="value">${day.windDir}</span></p>
-                <p><span class="label"> Скорость ветра:</span><span class="value">${day.windSpeed} м/с</span></p>
-                <p><span class="label"> Облачность:</span><span class="value">${day.clouds}</span></p>
-                <p><span class="label"> Осадки:</span><span class="value">${day.rain}</span></p>
-                <p><span class="label"> Влажность:</span><span class="value">${day.humidity}%</span></p>
+                <p><span class="label">Температура днём:</span><span class="value">${day.tempDay}°C</span></p>
+                <p><span class="label">Температура ночью:</span><span class="value">${day.tempNight}°C</span></p>
+                <p><span class="label">Давление:</span><span class="value">${day.pressure} мм</span></p>
+                <p><span class="label">Направление ветра:</span><span class="value">${day.windDir}</span></p>
+                <p><span class="label">Скорость ветра:</span><span class="value">${day.windSpeed} м/с</span></p>
+                <p><span class="label">Облачность:</span><span class="value">${day.clouds}</span></p>
+                <p><span class="label">Осадки:</span><span class="value">${day.rain}</span></p>
+                <p><span class="label">Влажность:</span><span class="value">${day.humidity}%</span></p>
             `;
             cardsContainer.appendChild(card);
         });
@@ -433,13 +608,13 @@
 
     const phases = [
         { type: 'random', duration: 700 },
-        { type: 'fixed', text: 'я уже красный' },
+        { type: 'fixed', text: 'данные брал с какого то сайта, так как всего не было на одном, я тут не причем' },
         { type: 'random', duration: 700 },
-        { type: 'fixed', text: 'бебебебе' },
+        { type: 'fixed', text: 'работай мой родненький чат джбт' },
         { type: 'random', duration: 700 },
         { type: 'fixed', text: 'смотря какой fabric' },
         { type: 'random', duration: 700 },
-         { type: 'fixed', text: 'я это делал неделю..' }
+        { type: 'fixed', text: 'я это делал неделю..' }
     ];
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%^&*()";
     function randomString(len = 12) {
@@ -544,6 +719,9 @@
     const page2Btn = document.getElementById('page2Btn');
     const engPage1 = document.getElementById('engPage1');
     const engPage2 = document.getElementById('engPage2');
+    const profileBtn = document.getElementById('profileBtn');
+    const modal = document.getElementById('profileModal');
+    const modalClose = document.getElementById('modalCloseBtn');
 
     function hideAllTabs() {
         geoContent.classList.add('hidden');
@@ -576,6 +754,23 @@
     page2Btn.addEventListener('click', () => {
         engPage2.classList.remove('hidden-page');
         engPage1.classList.add('hidden-page');
+    });
+
+    function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    profileBtn.addEventListener('click', openModal);
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
     });
 
     startMainCycle();
