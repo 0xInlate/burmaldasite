@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -778,3 +779,785 @@
 </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BurmaldaSite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        @font-face {
+            font-family: 'MineCustom';
+            src: url('assets/mine.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        body {
+            font-family: 'MineCustom', 'Courier New', monospace;
+            background-color: #0a0014;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #f0e6ff;
+            display: flex;
+        }
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 40% 20%, #3c0b6b, #0a0018);
+            z-index: -3;
+        }
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(160, 100, 255, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(160, 100, 255, 0.2) 1px, transparent 1px);
+            background-size: 80px 80px;
+            pointer-events: none;
+            z-index: -2;
+        }
+        .ambient-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 60% 70%, rgba(128, 0, 255, 0.3), transparent 75%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .side-panel {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 70px;
+            background: rgba(18, 5, 40, 0.88);
+            backdrop-filter: blur(14px);
+            border-right: 2px solid #aa6eff;
+            box-shadow: 6px 0 28px rgba(128, 0, 255, 0.6);
+            transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            z-index: 300;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .side-panel:hover {
+            width: 260px;
+        }
+        .dim-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.25s ease;
+            pointer-events: none;
+            z-index: 299;
+        }
+        .side-panel:hover ~ .dim-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+        .panel-items {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            padding: 2rem 0.5rem;
+        }
+        .spacer {
+            flex-grow: 1;
+        }
+        .panel-item {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            background: transparent;
+            padding: 8px;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            width: fit-content;
+        }
+        .side-panel:hover .panel-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(170, 110, 255, 0.5);
+            border-radius: 40px;
+            padding: 12px 20px;
+        }
+        .panel-item:hover {
+            background: #6329c4cc !important;
+            transform: scale(1.02);
+            border-color: #d9aaff;
+            box-shadow: 0 0 12px #b87cff;
+        }
+        .panel-icon {
+            display: inline-block;
+            width: 40px;
+            text-align: center;
+            font-size: 1.8rem;
+            color: #ddd;
+            filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
+        }
+        .panel-text {
+            font-family: 'MineCustom', monospace;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease 0.1s, visibility 0.2s;
+        }
+        .side-panel:hover .panel-text {
+            opacity: 1;
+            visibility: visible;
+        }
+        .home-cross {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 36px;
+            font-family: 'Courier New', monospace;
+            font-weight: normal;
+            color: #f0e6ff;
+            cursor: pointer;
+            z-index: 400;
+            transition: 0.2s;
+            line-height: 1;
+            text-shadow: 0 0 6px #aa6eff;
+        }
+        .home-cross:hover {
+            color: #ffffff;
+            transform: scale(1.1);
+            text-shadow: 0 0 12px #c084fc;
+        }
+        .main-container {
+            flex: 1;
+            margin-left: 70px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        #dynamicWord {
+            font-family: 'MineCustom', 'Press Start 2P', monospace;
+            font-size: 4rem;
+            letter-spacing: 6px;
+            text-shadow: 0 0 10px #b77eff, 0 0 25px #7a2be0, 0 0 40px #4400aa;
+            background: linear-gradient(135deg, #f2e6ff, #cb9eff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .tab-content {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 2rem;
+            border: 1px solid rgba(170, 110, 255, 0.5);
+            margin-top: 1rem;
+        }
+        .hidden {
+            display: none;
+        }
+        .cards-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 1.5rem;
+            padding: 1rem 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: #aa6eff #2a0a4a;
+        }
+        .cards-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+        .cards-scroll::-webkit-scrollbar-track {
+            background: #2a0a4a;
+            border-radius: 10px;
+        }
+        .cards-scroll::-webkit-scrollbar-thumb {
+            background: #aa6eff;
+            border-radius: 10px;
+        }
+        .weather-card {
+            min-width: 280px;
+            background: rgba(20, 5, 50, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 24px;
+            padding: 1.2rem;
+            border: 1px solid #aa6eff66;
+            transition: 0.2s;
+        }
+        .weather-card:hover {
+            transform: translateY(-5px);
+            border-color: #d9aaff;
+            box-shadow: 0 0 18px #b87cff66;
+        }
+        .weather-card h3 {
+            font-size: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #aa6eff;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .weather-card p {
+            margin: 0.6rem 0;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .weather-card .label {
+            color: #cbb2ff;
+        }
+        .weather-card .value {
+            font-weight: bold;
+        }
+        .eng-pages {
+            position: relative;
+            min-height: 400px;
+        }
+        .eng-page {
+            transition: opacity 0.3s;
+        }
+        .eng-page.hidden-page {
+            display: none;
+        }
+        .eng-page h2 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #e2b0ff;
+        }
+        .eng-page h3 {
+            margin: 1.5rem 0 0.5rem;
+            color: #d4a5ff;
+        }
+        .eng-page p {
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        .page-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .page-btn {
+            background: rgba(170, 110, 255, 0.3);
+            border: 1px solid #aa6eff;
+            border-radius: 40px;
+            padding: 0.6rem 1.8rem;
+            font-family: 'MineCustom', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #f0e6ff;
+        }
+        .page-btn:hover {
+            background: #7b2fcf;
+            transform: scale(1.05);
+        }
+        /* Модальное окно профиля */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background: rgba(25, 10, 50, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid #aa6eff;
+            box-shadow: 0 0 40px rgba(170, 110, 255, 0.4);
+            padding: 2rem;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.2s;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            font-size: 32px;
+            cursor: pointer;
+            color: #f0e6ff;
+            transition: 0.2s;
+        }
+        .modal-close:hover {
+            color: #ff80bf;
+            transform: scale(1.1);
+        }
+        .profile-avatar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .profile-avatar img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid #aa6eff;
+            object-fit: cover;
+            background: #2a0a4a;
+        }
+        .profile-name {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #e2b0ff;
+        }
+        .profile-info {
+            margin: 1rem 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        .profile-info p {
+            margin: 0.5rem 0;
+        }
+        .facts-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+        .facts-list li {
+            margin: 0.8rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        .facts-list li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: #aa6eff;
+        }
+        /* Адаптация под 4:3 */
+        @media (max-aspect-ratio: 4/3) {
+            .main-container {
+                margin-left: 70px;
+                padding: 1rem;
+            }
+            #dynamicWord {
+                font-size: 2.8rem;
+                letter-spacing: 3px;
+            }
+            .weather-card {
+                min-width: 240px;
+                padding: 0.8rem;
+            }
+            .weather-card p {
+                font-size: 0.75rem;
+            }
+            .tab-content {
+                padding: 1rem;
+            }
+            .eng-page h2 {
+                font-size: 1.5rem;
+            }
+            .eng-page p {
+                font-size: 0.85rem;
+            }
+        }
+        @media (max-width: 768px) {
+            .side-panel {
+                width: 60px;
+            }
+            .main-container {
+                margin-left: 60px;
+                padding: 1rem;
+            }
+            #dynamicWord {
+                font-size: 2.2rem;
+                letter-spacing: 2px;
+            }
+            .weather-card {
+                min-width: 220px;
+                padding: 0.7rem;
+            }
+            .weather-card p {
+                font-size: 0.7rem;
+            }
+            .tab-content {
+                padding: 1rem;
+            }
+            .eng-page h2 {
+                font-size: 1.3rem;
+            }
+            .eng-page p {
+                font-size: 0.8rem;
+            }
+            .page-btn {
+                padding: 0.4rem 1.2rem;
+                font-size: 1rem;
+            }
+            .home-cross {
+                top: 20px;
+                right: 20px;
+                font-size: 28px;
+            }
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            .profile-avatar img {
+                width: 90px;
+                height: 90px;
+            }
+            .profile-name {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-gradient"></div>
+<div class="grid-overlay"></div>
+<div class="ambient-glow"></div>
+<canvas id="particleCanvas"></canvas>
+
+<div class="side-panel">
+    <div class="panel-items">
+        <div class="panel-item" id="geoPanelBtn">
+            <div class="panel-icon">⌗</div>
+            <div class="panel-text">ГЕОГРАФИЯ</div>
+        </div>
+        <div class="panel-item" id="engPanelBtn">
+            <div class="panel-icon">A</div>
+            <div class="panel-text">АНГЛИЙСКИЙ</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="panel-item" id="profileBtn">
+            <div class="panel-icon">⦿</div>
+            <div class="panel-text">ПРОФИЛЬ</div>
+        </div>
+    </div>
+</div>
+<div class="dim-overlay"></div>
+
+<div class="home-cross" id="homeCrossBtn">✕</div>
+
+<div class="main-container">
+    <div id="dynamicWord">BURMALDASITE</div>
+    
+    <div id="geoContent" class="tab-content hidden">
+        <div class="cards-scroll" id="weatherCards"></div>
+    </div>
+
+    <div id="engContent" class="tab-content hidden">
+        <div class="eng-pages">
+            <div id="engPage1" class="eng-page">
+                <h2>Red Nose Day (UK)</h2>
+                <p><strong>Red Nose Day</strong> — крупнейший благотворительный телемарафон Великобритании, организованный <strong>Comic Relief</strong> в 1988 году. Проводится раз в два года (обычно в марте). Главный символ — красный нос, который надевают знаменитости и обычные люди.</p>
+                <h3>Традиции и формат</h3>
+                <p>Вечер юмора, музыки и трогательных историй на BBC. Звёзды комедии, певцы и актёры участвуют в скетчах, челленджах и прямых эфирах. Зрители жертвуют деньги через SMS, телефонные звонки и онлайн. За 30+ лет собрано более £1,5 миллиарда на помощь детям, бездомным, жертвам бедствий.</p>
+                <h3>Почему это важно</h3>
+                <p>Red Nose Day объединяет нацию смехом и добротой. Каждый может купить красный нос в супермаркете — часть суммы идёт в фонд. Праздник доказывает, что благотворительность может быть весёлой и доступной каждому.</p>
+            </div>
+            <div id="engPage2" class="eng-page hidden-page">
+                <h2>Российский аналог: «Добрая Воля»</h2>
+                <p><strong>«Добрая Воля»</strong> — всероссийский благотворительный фестиваль, который проводится в нескольких городах России (Москва, Санкт-Петербург, Казань, Екатеринбург и др.). Организаторы вдохновлялись идеей Red Nose Day: объединить развлечение и помощь нуждающимся.</p>
+                <h3>Формат и отличия</h3>
+                <p>В отличие от британского телемарафона, «Добрая Воля» делает упор на уличные фестивали, концерты местных групп, ярмарки hand-made и лекции о благотворительности. Сбор средств идёт через волонтёрские кружки, продажу сувениров и краудфандинг. Средства направляются в детские дома, хосписы, приюты для животных.</p>
+                <h3>Почему это аналог?</h3>
+                <p>Как и Red Nose Day, «Добрая Воля» использует позитивную атмосферу, чтобы привлечь внимание к социальным проблемам. У праздника нет единого символа (красного носа), но есть общая идея: <strong>«творить добро весело и просто»</strong>. Фестиваль пока не такой масштабный, но растёт с каждым годом.</p>
+            </div>
+        </div>
+        <div class="page-buttons">
+            <div class="page-btn" id="page1Btn">1</div>
+            <div class="page-btn" id="page2Btn">2</div>
+        </div>
+    </div>
+</div>
+ 
+<div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-close" id="modalCloseBtn">✕</div>
+        <div class="profile-avatar">
+            <img src="assets/image/ava.png" alt="avatar" onerror="this.src='https://via.placeholder.com/120?text=0x'">
+        </div>
+        <div class="profile-name">0xInlate</div>
+        <div class="profile-info">
+            <p><strong>Работа над проектом:</strong> 9–16 апреля 2026 (сикс-севен дней)</p>
+            <p><strong>Роль:</strong> веб разраб, дизайнер, ну и там еще че то</p>
+            <p><strong>Интересные факты:</strong></p>
+            <ul class="facts-list">
+                <li>за время создания сайта я выпил 5 литров чая</li>
+                <li>за время создания я прослушал весь свой плейлист...</li>
+                <li>я буду обновлять сайт, так что не потеряйте его</li>
+                <li>хост на картошке</li>
+                <li>сус вылазь там радиация</li>
+                <li>я уже красный</li>
+                <li>а вы знали что github pages платный?</li>
+                <li>бобр курва я пердоле</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    const weatherData = [
+        { date: "9 апреля", tempDay: "+8", tempNight: "+2", pressure: 760, windDir: "З", windSpeed: 4.5, clouds: "Переменная", rain: "Без осадков", humidity: 65 },
+        { date: "10 апреля", tempDay: "+9", tempNight: "+3", pressure: 758, windDir: "Ю-З", windSpeed: 5.2, clouds: "Облачно", rain: "Небольшой дождь", humidity: 72 },
+        { date: "11 апреля", tempDay: "+7", tempNight: "+2", pressure: 755, windDir: "С-З", windSpeed: 6.0, clouds: "Пасмурно", rain: "Дождь", humidity: 80 },
+        { date: "12 апреля", tempDay: "+6", tempNight: "0", pressure: 762, windDir: "С", windSpeed: 4.8, clouds: "Малооблачно", rain: "Без осадков", humidity: 55 },
+        { date: "13 апреля", tempDay: "+8", tempNight: "+1", pressure: 764, windDir: "С-В", windSpeed: 3.5, clouds: "Солнечно", rain: "Без осадков", humidity: 50 },
+        { date: "14 апреля", tempDay: "+10", tempNight: "+3", pressure: 761, windDir: "В", windSpeed: 4.2, clouds: "Малооблачно", rain: "Без осадков", humidity: 58 },
+        { date: "15 апреля", tempDay: "+11", tempNight: "+4", pressure: 758, windDir: "Ю-В", windSpeed: 5.5, clouds: "Облачно", rain: "Без осадков", humidity: 62 },
+        { date: "16 апреля", tempDay: "+10", tempNight: "+5", pressure: 754, windDir: "Ю", windSpeed: 6.3, clouds: "Пасмурно", rain: "Небольшой дождь", humidity: 75 }
+    ];
+
+    const cardsContainer = document.getElementById('weatherCards');
+    function buildWeatherCards() {
+        cardsContainer.innerHTML = '';
+        weatherData.forEach(day => {
+            const card = document.createElement('div');
+            card.className = 'weather-card';
+            card.innerHTML = `
+                <h3>${day.date}</h3>
+                <p><span class="label">Температура днём:</span><span class="value">${day.tempDay}°C</span></p>
+                <p><span class="label">Температура ночью:</span><span class="value">${day.tempNight}°C</span></p>
+                <p><span class="label">Давление:</span><span class="value">${day.pressure} мм</span></p>
+                <p><span class="label">Направление ветра:</span><span class="value">${day.windDir}</span></p>
+                <p><span class="label">Скорость ветра:</span><span class="value">${day.windSpeed} м/с</span></p>
+                <p><span class="label">Облачность:</span><span class="value">${day.clouds}</span></p>
+                <p><span class="label">Осадки:</span><span class="value">${day.rain}</span></p>
+                <p><span class="label">Влажность:</span><span class="value">${day.humidity}%</span></p>
+            `;
+            cardsContainer.appendChild(card);
+        });
+    }
+    buildWeatherCards();
+
+    const titleEl = document.getElementById('dynamicWord');
+    let animationInterval = null, animationTimeout = null;
+    let isCycling = true;
+
+    const phases = [
+        { type: 'random', duration: 700 },
+        { type: 'fixed', text: 'данные брал с какого то сайта, так как всего не было на одном, я тут не причем' },
+        { type: 'random', duration: 700 },
+        { type: 'fixed', text: 'работай мой родненький чат джбт' },
+        { type: 'random', duration: 700 },
+        { type: 'fixed', text: 'смотря какой fabric' },
+        { type: 'random', duration: 700 },
+        { type: 'fixed', text: 'я это делал неделю..' }
+    ];
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%^&*()";
+    function randomString(len = 12) {
+        let out = '';
+        for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
+        return out;
+    }
+    function stopAnimation() {
+        if (animationInterval) { clearInterval(animationInterval); animationInterval = null; }
+        if (animationTimeout) { clearTimeout(animationTimeout); animationTimeout = null; }
+    }
+    function startRandomPhase(duration, next) {
+        stopAnimation();
+        animationInterval = setInterval(() => { if (isCycling) titleEl.innerText = randomString(12); }, 90);
+        animationTimeout = setTimeout(() => {
+            if (animationInterval) clearInterval(animationInterval);
+            animationInterval = null;
+            next();
+        }, duration);
+    }
+    function showFixedText(text, next) {
+        stopAnimation();
+        titleEl.innerText = text;
+        animationTimeout = setTimeout(() => { next(); }, 1800);
+    }
+    function runCycle(index) {
+        if (!isCycling) return;
+        if (index >= phases.length) { runCycle(0); return; }
+        const p = phases[index];
+        if (p.type === 'random') startRandomPhase(p.duration, () => runCycle(index + 1));
+        else showFixedText(p.text, () => runCycle(index + 1));
+    }
+    function startMainCycle() {
+        isCycling = true;
+        let chaosCount = 0;
+        const chaosInt = setInterval(() => {
+            if (isCycling) titleEl.innerText = randomString(12);
+            chaosCount++;
+            if (chaosCount > 12) { clearInterval(chaosInt); runCycle(0); }
+        }, 90);
+    }
+    function setStaticTitle(text) {
+        if (isCycling === true) { isCycling = false; stopAnimation(); }
+        titleEl.innerText = text;
+    }
+    function resetToCycling() {
+        if (isCycling === false) { isCycling = true; stopAnimation(); startMainCycle(); }
+    }
+
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    let w = window.innerWidth, h = window.innerHeight;
+    let particles = [];
+    function resizeCanvas() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
+    class ParticleV {
+        constructor() {
+            this.x = Math.random() * w;
+            this.y = Math.random() * h;
+            this.size = Math.random() * 5 + 2;
+            this.speedX = (Math.random() - 0.5) * 0.7;
+            this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
+            this.opacity = Math.random() * 0.6 + 0.2;
+            this.color = `rgba(170, 100, 255, ${this.opacity})`;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x < 0) this.x = w;
+            if (this.x > w) this.x = 0;
+            if (this.y < 0) this.y = h;
+            if (this.y > h) this.y = 0;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.shadowBlur = 14;
+            ctx.shadowColor = "#b56eff";
+            ctx.fill();
+        }
+    }
+    function initParticles(count) {
+        particles = [];
+        for (let i = 0; i < count; i++) particles.push(new ParticleV());
+    }
+    function animateParticles() {
+        ctx.clearRect(0, 0, w, h);
+        for (let p of particles) { p.update(); p.draw(); }
+        requestAnimationFrame(animateParticles);
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); initParticles(130); });
+    resizeCanvas();
+    initParticles(130);
+    animateParticles();
+
+    const geoBtn = document.getElementById('geoPanelBtn');
+    const engBtn = document.getElementById('engPanelBtn');
+    const homeCross = document.getElementById('homeCrossBtn');
+    const geoContent = document.getElementById('geoContent');
+    const engContent = document.getElementById('engContent');
+    const page1Btn = document.getElementById('page1Btn');
+    const page2Btn = document.getElementById('page2Btn');
+    const engPage1 = document.getElementById('engPage1');
+    const engPage2 = document.getElementById('engPage2');
+    const profileBtn = document.getElementById('profileBtn');
+    const modal = document.getElementById('profileModal');
+    const modalClose = document.getElementById('modalCloseBtn');
+
+    function hideAllTabs() {
+        geoContent.classList.add('hidden');
+        engContent.classList.add('hidden');
+    }
+
+    geoBtn.addEventListener('click', () => {
+        hideAllTabs();
+        geoContent.classList.remove('hidden');
+        setStaticTitle('ПОГОДА');
+    });
+
+    engBtn.addEventListener('click', () => {
+        hideAllTabs();
+        engContent.classList.remove('hidden');
+        setStaticTitle('RED NOSE DAY');
+        engPage1.classList.remove('hidden-page');
+        engPage2.classList.add('hidden-page');
+    });
+
+    homeCross.addEventListener('click', () => {
+        hideAllTabs();
+        resetToCycling();
+    });
+
+    page1Btn.addEventListener('click', () => {
+        engPage1.classList.remove('hidden-page');
+        engPage2.classList.add('hidden-page');
+    });
+    page2Btn.addEventListener('click', () => {
+        engPage2.classList.remove('hidden-page');
+        engPage1.classList.add('hidden-page');
+    });
+
+    function openModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    profileBtn.addEventListener('click', openModal);
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    startMainCycle();
+    hideAllTabs();
+</script>
+</body>
+</html>
+>>>>>>> ea59a1d776887119c1adc91bc90eb94b0ec26a85
