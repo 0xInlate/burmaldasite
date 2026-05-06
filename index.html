@@ -3,13 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>BurmaldaSite</title>
+    <title>BurmaldaSite | бурмалда </title>
     <style>
+        :root {
+            --bg-deep: #0a0014;
+            --purple-glow: #aa6eff;
+            --purple-bright: #b87cff;
+            --purple-light: #d9aaff;
+            --card-bg: rgba(20, 5, 50, 0.7);
+            --radius-lg: 28px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-stack: 'MineCustom', 'Courier New', monospace;
+            --side-panel-width: 68px;
+            --side-panel-expanded: 260px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         @font-face {
@@ -21,87 +35,122 @@
         }
 
         body {
-            font-family: 'MineCustom', 'Courier New', monospace;
-            background-color: #0a0014;
-            min-height: 100vh;
-            overflow-x: hidden;
-            color: #f0e6ff;
+            font-family: var(--font-stack);
+            background: #0a0014;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            color: var(--text-main);
             display: flex;
+            -webkit-font-smoothing: antialiased;
+            contain: layout style;
+            --text-main: #f0e6ff;
+        }
+
+        
+        .bg-gradient,
+        .grid-overlay,
+        .ambient-glow,
+        .scanlines {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
         }
         .bg-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 40% 20%, #3c0b6b, #0a0018);
             z-index: -3;
+            background: radial-gradient(circle at 40% 20%, #0b2b4a, #001428 80%);
+            animation: bgShift 12s ease-in-out infinite;
+        }
+        @keyframes bgShift {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.85;
+                filter: hue-rotate(10deg);
+            }
         }
         .grid-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(160, 100, 255, 0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(160, 100, 255, 0.2) 1px, transparent 1px);
-            background-size: 80px 80px;
-            pointer-events: none;
             z-index: -2;
+            background-image: linear-gradient(rgba(0, 180, 255, 0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 180, 255, 0.12) 1px, transparent 1px);
+            background-size: 80px 80px;
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove {
+            0%,
+            100% {
+                background-position: 0 0;
+            }
+            50% {
+                background-position: 2px 2px;
+            }
         }
         .ambient-glow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 60% 70%, rgba(128, 0, 255, 0.3), transparent 75%);
-            pointer-events: none;
             z-index: -1;
+            background: radial-gradient(circle at 60% 70%, rgba(0, 120, 210, 0.3), transparent 70%);
+            animation: ambientPulse 8s ease-in-out infinite;
         }
+        @keyframes ambientPulse {
+            0%,
+            100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.08);
+            }
+        }
+        .scanlines {
+            z-index: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+            opacity: 0.35;
+        }
+
         #particleCanvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             pointer-events: none;
-            z-index: 0;
+            z-index: 1;
         }
+
+        
         .side-panel {
             position: fixed;
             left: 0;
             top: 0;
             height: 100vh;
-            width: 70px;
-            background: rgba(18, 5, 40, 0.88);
-            backdrop-filter: blur(14px);
-            border-right: 2px solid #aa6eff;
-            box-shadow: 6px 0 28px rgba(128, 0, 255, 0.6);
+            height: 100dvh;
+            width: var(--side-panel-width);
+            background: rgba(5, 15, 35, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-right: 2px solid #0080dd;
+            box-shadow: 6px 0 28px rgba(0, 130, 230, 0.5);
             transition: width 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             z-index: 300;
             overflow: hidden;
             white-space: nowrap;
+            contain: layout style;
         }
         .side-panel:hover {
-            width: 260px;
+            width: var(--side-panel-expanded);
         }
         .dim-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.65);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
             opacity: 0;
             visibility: hidden;
-            transition: 0.25s ease;
+            transition: opacity 0.25s, visibility 0.25s;
             pointer-events: none;
             z-index: 299;
         }
-        .side-panel:hover ~ .dim-overlay {
+        .side-panel:hover~.dim-overlay {
             opacity: 1;
             visibility: visible;
         }
@@ -109,8 +158,8 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 2rem 0.5rem;
-            gap: 1.2rem; /* фикс: расстояние между кнопками */
+            padding: 2rem 0.4rem;
+            gap: 1rem;
         }
         .spacer {
             flex-grow: 1;
@@ -118,622 +167,1236 @@
         .panel-item {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 16px;
             background: transparent;
-            padding: 8px;
-            border: none;
-            border-radius: 0;
+            padding: 10px 6px;
+            border: 1px solid transparent;
+            border-radius: 44px;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s;
             width: fit-content;
+            position: relative;
         }
         .side-panel:hover .panel-item {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(170, 110, 255, 0.5);
-            border-radius: 40px;
-            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 160, 255, 0.4);
+            padding: 14px 22px;
         }
         .panel-item:hover {
-            background: #6329c4cc !important;
-            transform: scale(1.02);
-            border-color: #d9aaff;
-            box-shadow: 0 0 12px #b87cff;
+            background: #0055cccc !important;
+            transform: scale(1.03);
+            border-color: #77ccff !important;
+            box-shadow: 0 0 16px #0099ff;
+            animation: btnPulse 0.6s ease-out;
+        }
+        @keyframes btnPulse {
+            0% {
+                box-shadow: 0 0 8px #0099ff;
+            }
+            50% {
+                box-shadow: 0 0 32px #77ccff, 0 0 60px #0066cc;
+            }
+            100% {
+                box-shadow: 0 0 16px #0099ff;
+            }
+        }
+        .panel-item:active {
+            transform: scale(0.94) !important;
+            transition: transform 0.08s ease;
         }
         .panel-icon {
             display: inline-block;
-            width: 40px;
+            width: 38px;
             text-align: center;
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             color: #ddd;
-            filter: drop-shadow(0 0 2px rgba(255,255,255,0.3));
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.35));
+            transition: transform 0.2s;
+        }
+        .panel-item:hover .panel-icon {
+            transform: rotate(-8deg) scale(1.15);
         }
         .panel-text {
-            font-family: 'MineCustom', monospace;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+            font-family: var(--font-stack);
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
             font-weight: bold;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.2s ease 0.1s, visibility 0.2s;
+            transition: opacity 0.2s 0.08s, visibility 0.2s;
         }
         .side-panel:hover .panel-text {
             opacity: 1;
             visibility: visible;
         }
-        .home-cross {
+
+        
+        .top-controls {
             position: fixed;
-            top: 30px;
-            right: 30px;
-            font-size: 36px;
-            font-family: 'Courier New', monospace;
-            font-weight: normal;
-            color: #f0e6ff;
-            cursor: pointer;
+            top: 18px;
+            right: 18px;
+            display: flex;
+            gap: 12px;
             z-index: 400;
-            transition: 0.2s;
+            align-items: center;
+        }
+        .lang-switch {
+            background: rgba(5, 15, 35, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid #0080dd;
+            border-radius: 60px;
+            padding: 10px 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            transition: all 0.2s;
+            color: var(--text-main);
+            font-family: var(--font-stack);
+        }
+        .lang-switch:hover {
+            background: #0055cccc;
+            transform: scale(1.06);
+            border-color: #77ccff;
+            box-shadow: 0 0 14px #0099ff;
+        }
+        .lang-switch:active {
+            transform: scale(0.92) !important;
+        }
+        .lang-icon {
+            font-size: 1.1rem;
+            animation: floatIcon 3s ease-in-out infinite;
+        }
+        @keyframes floatIcon {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-4px);
+            }
+        }
+        .lang-text {
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+        .home-cross {
+            font-size: 34px;
+            font-family: 'Courier New', monospace;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
             line-height: 1;
-            text-shadow: 0 0 6px #aa6eff;
+            text-shadow: 0 0 8px #0099ff;
         }
         .home-cross:hover {
-            color: #ffffff;
-            transform: scale(1.1);
-            text-shadow: 0 0 12px #c084fc;
+            color: #fff;
+            transform: scale(1.15) rotate(90deg);
+            text-shadow: 0 0 20px #77ccff, 0 0 40px #0066cc;
         }
+        .home-cross:active {
+            transform: scale(0.85) rotate(180deg) !important;
+            transition: transform 0.08s ease;
+        }
+
+        
         .main-container {
             flex: 1;
-            margin-left: 70px;
-            min-height: 100vh;
+            margin-left: var(--side-panel-width);
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            padding: 1.5rem 1.5rem 0.5rem;
             position: relative;
             z-index: 10;
+            contain: layout style;
+            min-width: 0;
         }
+
+        
         #dynamicWord {
-            font-family: 'MineCustom', 'Press Start 2P', monospace;
-            font-size: 4rem;
-            letter-spacing: 6px;
-            text-shadow: 0 0 10px #b77eff, 0 0 25px #7a2be0, 0 0 40px #4400aa;
-            background: linear-gradient(135deg, #f2e6ff, #cb9eff);
+            font-family: var(--font-stack);
+            font-size: clamp(1.8rem, 4vw, 3.5rem);
+            letter-spacing: 5px;
+            text-shadow: 0 0 12px #33aaff, 0 0 28px #0077cc, 0 0 50px #003366;
+            background: linear-gradient(135deg, #e6f2ff, #99ccff, #cce6ff);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
+            animation: titleGlitch 6s ease-in-out infinite;
+            flex-shrink: 0;
         }
+        @keyframes titleGlitch {
+            0%,
+            90%,
+            100% {
+                transform: translate(0);
+            }
+            91% {
+                transform: translate(-3px, 2px);
+            }
+            92% {
+                transform: translate(3px, -1px);
+            }
+            93% {
+                transform: translate(-1px, -2px);
+            }
+            94% {
+                transform: translate(1px, 1px);
+            }
+            95% {
+                transform: translate(0);
+            }
+        }
+        #dynamicWord.glitch-heavy {
+            animation: glitchBurst 0.4s ease-out;
+        }
+        @keyframes glitchBurst {
+            0% {
+                transform: translate(0);
+                text-shadow: 0 0 12px #33aaff, 0 0 28px #0077cc;
+            }
+            20% {
+                transform: translate(-6px, 3px);
+                text-shadow: -4px 0 #ff00ff, 4px 0 #00ffff, 0 0 40px #fff;
+            }
+            40% {
+                transform: translate(5px, -2px);
+                text-shadow: 4px 0 #ff00ff, -4px 0 #00ffff;
+            }
+            60% {
+                transform: translate(-3px, -4px);
+                text-shadow: -6px 0 #ff00ff, 6px 0 #00ffff, 0 0 50px #fff;
+            }
+            100% {
+                transform: translate(0);
+                text-shadow: 0 0 12px #33aaff, 0 0 28px #0077cc;
+            }
+        }
+
+        
         .tab-content {
             width: 100%;
-            max-width: 1200px;
-            background: rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(12px);
+            flex: 1;
+            min-height: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-radius: 32px;
-            padding: 2rem;
-            border: 1px solid rgba(170, 110, 255, 0.5);
-            margin-top: 1rem;
-        }
-        .hidden {
-            display: none;
-        }
-        .cards-scroll {
+            border: 1px solid rgba(0, 160, 255, 0.4);
             display: flex;
-            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding: 1rem;
             gap: 1.5rem;
-            padding: 1rem 0.5rem;
-            scrollbar-width: thin;
-            scrollbar-color: #aa6eff #2a0a4a;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            contain: layout style;
+            animation: fadeSlideIn 0.4s ease-out;
+            overflow-x: hidden;
+            overflow-y: auto;
+            flex-wrap: wrap;
+            align-content: flex-start;
         }
-        .cards-scroll::-webkit-scrollbar {
-            height: 8px;
+        .tab-content::-webkit-scrollbar {
+            width: 8px;
         }
-        .cards-scroll::-webkit-scrollbar-track {
-            background: #2a0a4a;
+        .tab-content::-webkit-scrollbar-track {
+            background: #0a1a2e;
             border-radius: 10px;
         }
-        .cards-scroll::-webkit-scrollbar-thumb {
-            background: #aa6eff;
+        .tab-content::-webkit-scrollbar-thumb {
+            background: #0099dd;
             border-radius: 10px;
+            box-shadow: 0 0 8px #0099ff;
         }
-        .weather-card {
-            min-width: 280px;
-            background: rgba(20, 5, 50, 0.7);
-            backdrop-filter: blur(4px);
-            border-radius: 24px;
-            padding: 1.2rem;
-            border: 1px solid #aa6eff66;
-            transition: 0.2s;
+        .tab-content.hidden {
+            display: none !important;
         }
-        .weather-card:hover {
-            transform: translateY(-5px);
-            border-color: #d9aaff;
-            box-shadow: 0 0 18px #b87cff66;
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .weather-card h3 {
-            font-size: 1.5rem;
-            text-align: center;
-            border-bottom: 1px solid #aa6eff;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .weather-card p {
-            margin: 0.6rem 0;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .weather-card .label {
-            color: #cbb2ff;
-        }
-        .weather-card .value {
-            font-weight: bold;
-        }
-        .eng-pages {
-            position: relative;
-            min-height: 400px;
-        }
-        .eng-page {
-            transition: opacity 0.3s;
-        }
-        .eng-page.hidden-page {
-            display: none;
-        }
-        .eng-page h2 {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            color: #e2b0ff;
-        }
-        .eng-page h3 {
-            margin: 1.5rem 0 0.5rem;
-            color: #d4a5ff;
-        }
-        .eng-page p {
-            line-height: 1.5;
-            margin-bottom: 1rem;
-        }
-        .page-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-        .page-btn {
-            background: rgba(170, 110, 255, 0.3);
-            border: 1px solid #aa6eff;
-            border-radius: 40px;
-            padding: 0.6rem 1.8rem;
-            font-family: 'MineCustom', monospace;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #f0e6ff;
-        }
-        .page-btn:hover {
-            background: #7b2fcf;
-            transform: scale(1.05);
-        }
-        /* Стили для профиля (отдельная вкладка) */
-        .profile-grid {
+
+        
+        .geo-empty {
+            min-width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            height: 100%;
+        }
+        .sad-emoji {
+            font-size: clamp(4rem, 8vw, 7rem);
+            animation: sadFloat 3.5s ease-in-out infinite;
+            filter: drop-shadow(0 0 25px rgba(0, 160, 255, 0.7));
+        }
+        @keyframes sadFloat {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            30% {
+                transform: translateY(-18px) rotate(-3deg);
+            }
+            60% {
+                transform: translateY(-8px) rotate(2deg);
+            }
+            85% {
+                transform: translateY(-22px) rotate(-1deg);
+            }
+        }
+        .geo-empty-text {
+            font-size: 1.3rem;
+            color: #a0c8e0;
+            letter-spacing: 2px;
+            animation: textFadePulse 2.5s ease-in-out infinite;
+        }
+        @keyframes textFadePulse {
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        .geo-empty-dots span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #0099dd;
+            margin: 0 6px;
+            animation: dotBounce 1.8s ease-in-out infinite;
+            box-shadow: 0 0 10px #0099ff;
+        }
+        .geo-empty-dots span:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        .geo-empty-dots span:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        @keyframes dotBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-16px);
+                opacity: 1;
+            }
+        }
+
+        
+        .ocean-full-slide {
+            width: 100%;
+            max-width: 100%;
+            flex: 1 1 auto;
+            min-height: 0;
+            background: rgba(5, 15, 35, 0.65);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 160, 255, 0.5);
+            border-radius: 32px;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: #0099dd #0a1a2e;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            animation: fadeSlideIn 0.5s ease-out;
+        }
+        .ocean-full-slide::-webkit-scrollbar {
+            width: 5px;
+        }
+        .ocean-full-slide::-webkit-scrollbar-track {
+            background: #0a1a2e;
+            border-radius: 10px;
+        }
+        .ocean-full-slide::-webkit-scrollbar-thumb {
+            background: #0099dd;
+            border-radius: 10px;
+        }
+        .ocean-full-slide h2 {
+            color: #99d6ff;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(0, 160, 255, 0.6);
+            flex-shrink: 0;
+            text-align: center;
+        }
+        .ocean-full-slide .ocean-intro {
+            text-align: center;
+            color: #c0d8f0;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            line-height: 1.5;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .ocean-banner {
+            width: 100%;
+            height: 200px;
+            border-radius: 24px;
+            border: 2px dashed rgba(0, 160, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.25);
+            color: #7a9ab8;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .ocean-banner img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+            animation: imgFadeIn 0.8s ease-out;
+        }
+        @keyframes imgFadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .ocean-banner:hover {
+            border-color: #77ccff;
+            box-shadow: 0 0 20px rgba(0, 160, 255, 0.35);
+        }
+        .ocean-facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        .ocean-fact-card {
+            background: rgba(0, 0, 0, 0.28);
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(0, 160, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+            min-width: 0;
+            opacity: 0;
+            transform: translateY(25px);
+        }
+        .ocean-fact-card.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .ocean-fact-card:hover {
+            border-color: #77ccff;
+            box-shadow: 0 0 22px rgba(0, 160, 255, 0.4);
+            transform: translateY(-4px);
+        }
+        .ocean-fact-card .fact-num {
+            font-size: 2.5rem;
+            color: #77ccff;
+            text-shadow: 0 0 12px rgba(0, 160, 255, 0.6);
+            font-weight: bold;
+            line-height: 1;
+        }
+        .ocean-fact-card h3 {
+            color: #99d6ff;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        .ocean-fact-card p {
+            font-size: 0.85rem;
+            line-height: 1.45;
+            color: #c0d0e8;
+            flex-grow: 1;
+        }
+        .ocean-fact-card .fact-img-slot {
+            width: 100%;
+            min-height: 100px;
+            max-height: 140px;
+            border: 2px dashed rgba(0, 160, 255, 0.35);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            color: #7a9ab8;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .ocean-fact-card .fact-img-slot img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+            animation: imgFadeIn 0.5s ease-out;
+        }
+        .ocean-fact-card .fact-img-slot:hover {
+            border-color: #77ccff;
+            box-shadow: 0 0 14px rgba(0, 160, 255, 0.3);
+        }
+
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0);
+            animation: rippleEffect 0.7s ease-out forwards;
+            pointer-events: none;
+            z-index: 2;
+        }
+        @keyframes rippleEffect {
+            to {
+                transform: scale(6);
+                opacity: 0;
+            }
+        }
+
+        
+        .back-btn {
+            display: inline-block;
+            background: rgba(0, 160, 255, 0.25);
+            border: 1px solid #0080dd;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-family: var(--font-stack);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+            letter-spacing: 1px;
+            text-align: center;
+            width: fit-content;
+            flex-shrink: 0;
+            align-self: center;
+            margin-top: 0.3rem;
+        }
+        .back-btn:hover {
+            background: #0066cc;
+            transform: scale(1.05);
+            box-shadow: 0 0 14px #0099ff;
+        }
+        .back-btn:active {
+            transform: scale(0.94) !important;
+            transition: transform 0.08s ease;
+        }
+
+        
+        .profile-slides {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2rem;
+            height: 100%;
+            align-items: center;
         }
         .profile-card {
-            background: rgba(20, 5, 50, 0.7);
+            background: var(--card-bg);
             backdrop-filter: blur(4px);
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 1px solid #aa6eff66;
-            transition: 0.2s;
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.8rem;
+            border: 1px solid rgba(0, 160, 255, 0.4);
+            transition: all 0.2s;
+            flex: 0 0 auto;
+            width: 300px;
+            max-width: 85vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            content-visibility: auto;
+            contain: layout style;
         }
         .profile-card:hover {
-            transform: translateY(-3px);
-            border-color: #d9aaff;
-            box-shadow: 0 0 12px #b87cff66;
-        }
-        .profile-avatar {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 1rem;
+            transform: translateY(-5px);
+            border-color: #77ccff;
+            box-shadow: 0 0 22px rgba(0, 160, 255, 0.5);
         }
         .profile-avatar img {
-            width: 140px;
-            height: 140px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            border: 3px solid #aa6eff;
+            border: 3px solid #0080dd;
             object-fit: cover;
-            background: #2a0a4a;
+            background: #0a1a2e;
+            animation: avatarGlow 4s ease-in-out infinite;
+        }
+        @keyframes avatarGlow {
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(0, 160, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 35px rgba(0, 160, 255, 0.8), 0 0 60px rgba(0, 100, 200, 0.5);
+            }
         }
         .profile-nick {
+            font-size: 1.8rem;
+            color: #99d6ff;
+            letter-spacing: 2px;
             text-align: center;
-            font-size: 2rem;
-            margin-top: 0.5rem;
-            color: #e2b0ff;
         }
         .fact-item {
-            margin: 1rem 0;
-            padding: 0.8rem;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 20px;
-            border-left: 4px solid #aa6eff;
+            padding: 0.8rem;
+            border-left: 4px solid #0080dd;
+            margin: 0.3rem 0;
+            font-size: 0.85rem;
+            text-align: left;
+            width: 100%;
+            line-height: 1.4;
         }
         .fact-item strong {
-            color: #d9aaff;
+            color: #77ccff;
         }
-        /* Адаптация под 4:3 */
-        @media (max-aspect-ratio: 4/3) {
+
+        
+        @media (max-width: 768px) {
+            :root {
+                --side-panel-width: 52px;
+            }
             .main-container {
-                margin-left: 70px;
-                padding: 1rem;
-            }
-            #dynamicWord {
-                font-size: 2.8rem;
-                letter-spacing: 3px;
-            }
-            .weather-card {
-                min-width: 240px;
+                margin-left: var(--side-panel-width);
                 padding: 0.8rem;
             }
-            .weather-card p {
-                font-size: 0.75rem;
-            }
-            .tab-content {
-                padding: 1rem;
-            }
-            .eng-page h2 {
-                font-size: 1.5rem;
-            }
-            .eng-page p {
-                font-size: 0.85rem;
-            }
-            .profile-avatar img {
-                width: 110px;
-                height: 110px;
-            }
-            .profile-nick {
-                font-size: 1.6rem;
-            }
-        }
-        /* Телефоны */
-        @media (max-width: 768px) {
-            .side-panel {
-                width: 60px;
-            }
-            .main-container {
-                margin-left: 60px;
-                padding: 1rem;
-            }
             #dynamicWord {
-                font-size: 2.2rem;
-                letter-spacing: 2px;
+                font-size: 1.4rem;
+                letter-spacing: 3px;
             }
-            .weather-card {
-                min-width: 220px;
-                padding: 0.7rem;
-            }
-            .weather-card p {
-                font-size: 0.7rem;
-            }
-            .tab-content {
+            .ocean-full-slide {
                 padding: 1rem;
+                border-radius: 24px;
             }
-            .eng-page h2 {
-                font-size: 1.3rem;
+            .ocean-facts-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
             }
-            .eng-page p {
-                font-size: 0.8rem;
+            .ocean-fact-card {
+                padding: 0.8rem 1rem;
             }
-            .page-btn {
-                padding: 0.4rem 1.2rem;
-                font-size: 1rem;
+            .ocean-fact-card .fact-num {
+                font-size: 2rem;
             }
-            .home-cross {
-                top: 20px;
-                right: 20px;
-                font-size: 28px;
+            .ocean-banner {
+                height: 140px;
             }
-            .profile-avatar img {
-                width: 90px;
-                height: 90px;
+            .profile-card {
+                width: 240px;
+                padding: 1.2rem;
             }
             .profile-nick {
                 font-size: 1.4rem;
+            }
+            .top-controls {
+                top: 10px;
+                right: 10px;
+                gap: 8px;
+            }
+            .lang-switch {
+                padding: 8px 14px;
+            }
+            .lang-text {
+                font-size: 0.8rem;
+            }
+            .home-cross {
+                font-size: 28px;
+            }
+            .tab-content {
+                padding: 0.6rem;
+                gap: 1rem;
+                border-radius: 24px;
+            }
+        }
+        @media (max-width: 400px) {
+            .ocean-facts-grid {
+                grid-template-columns: 1fr;
+            }
+            .profile-slides {
+                gap: 1rem;
+            }
+            .profile-card {
+                width: 78vw;
             }
         }
     </style>
 </head>
 <body>
+    <div class="bg-gradient"></div>
+    <div class="grid-overlay"></div>
+    <div class="ambient-glow"></div>
+    <div class="scanlines"></div>
+    <canvas id="particleCanvas"></canvas>
 
-<div class="bg-gradient"></div>
-<div class="grid-overlay"></div>
-<div class="ambient-glow"></div>
-<canvas id="particleCanvas"></canvas>
-
-<div class="side-panel">
-    <div class="panel-items">
-        <div class="panel-item" id="geoPanelBtn">
-            <div class="panel-icon">⌗</div>
-            <div class="panel-text">ГЕОГРАФИЯ</div>
-        </div>
-        <div class="panel-item" id="engPanelBtn">
-            <div class="panel-icon">A</div>
-            <div class="panel-text">АНГЛИЙСКИЙ</div>
-        </div>
-        <div class="spacer"></div>
-        <div class="panel-item" id="profilePanelBtn">
-            <div class="panel-icon">⦿</div>
-            <div class="panel-text">ПРОФИЛЬ</div>
-        </div>
-    </div>
-</div>
-<div class="dim-overlay"></div>
-
-<div class="home-cross" id="homeCrossBtn">✕</div>
-
-<div class="main-container">
-    <div id="dynamicWord">BURMALDASITE</div>
     
-    <!-- География -->
-    <div id="geoContent" class="tab-content hidden">
-        <div class="cards-scroll" id="weatherCards"></div>
-    </div>
-
-    <!-- Английский -->
-    <div id="engContent" class="tab-content hidden">
-        <div class="eng-pages">
-            <div id="engPage1" class="eng-page">
-                <h2>Red Nose Day (UK)</h2>
-                <p><strong>Red Nose Day</strong> — крупнейший благотворительный телемарафон Великобритании, организованный <strong>Comic Relief</strong> в 1988 году. Проводится раз в два года (обычно в марте). Главный символ — красный нос, который надевают знаменитости и обычные люди.</p>
-                <h3>Традиции и формат</h3>
-                <p>Вечер юмора, музыки и трогательных историй на BBC. Звёзды комедии, певцы и актёры участвуют в скетчах, челленджах и прямых эфирах. Зрители жертвуют деньги через SMS, телефонные звонки и онлайн. За 30+ лет собрано более £1,5 миллиарда на помощь детям, бездомным, жертвам бедствий.</p>
-                <h3>Почему это важно</h3>
-                <p>Red Nose Day объединяет нацию смехом и добротой. Каждый может купить красный нос в супермаркете — часть суммы идёт в фонд. Праздник доказывает, что благотворительность может быть весёлой и доступной каждому.</p>
+    <div class="side-panel">
+        <div class="panel-items">
+            <div class="panel-item" data-tab="geo">
+                <div class="panel-icon">⌗</div>
+                <div class="panel-text" data-i18n="geoLabel">ГЕОГРАФИЯ</div>
             </div>
-            <div id="engPage2" class="eng-page hidden-page">
-                <h2>Российский аналог: «Добрая Воля»</h2>
-                <p><strong>«Добрая Воля»</strong> — всероссийский благотворительный фестиваль, который проводится в нескольких городах России (Москва, Санкт-Петербург, Казань, Екатеринбург и др.). Организаторы вдохновлялись идеей Red Nose Day: объединить развлечение и помощь нуждающимся.</p>
-                <h3>Формат и отличия</h3>
-                <p>В отличие от британского телемарафона, «Добрая Воля» делает упор на уличные фестивали, концерты местных групп, ярмарки hand-made и лекции о благотворительности. Сбор средств идёт через волонтёрские кружки, продажу сувениров и краудфандинг. Средства направляются в детские дома, хосписы, приюты для животных.</p>
-                <h3>Почему это аналог?</h3>
-                <p>Как и Red Nose Day, «Добрая Воля» использует позитивную атмосферу, чтобы привлечь внимание к социальным проблемам. У праздника нет единого символа (красного носа), но есть общая идея: <strong>«творить добро весело и просто»</strong>. Фестиваль пока не такой масштабный, но растёт с каждым годом.</p>
+            <div class="panel-item" data-tab="eng">
+                <div class="panel-icon">🦞</div>
+                <div class="panel-text" data-i18n="engLabel">ОКЕАН</div>
             </div>
-        </div>
-        <div class="page-buttons">
-            <div class="page-btn" id="page1Btn">1</div>
-            <div class="page-btn" id="page2Btn">2</div>
-        </div>
-    </div>
-
-    <!-- Профиль (отдельная вкладка) -->
-    <div id="profileContent" class="tab-content hidden">
-        <div class="profile-grid">
-            <div class="profile-card">
-                <div class="profile-avatar">
-                    <img src="assets/image/ava.png" alt="avatar" onerror="this.src='https://via.placeholder.com/140?text=0x'">
-                </div>
-                <div class="profile-nick">0xInlate</div>
-            </div>
-            <div class="profile-card">
-                <h3 style="color:#d4a5ff; margin-bottom:1rem;">Интересные факты</h3>
-                <div class="fact-item"><strong>Факт 1:</strong> за время создания сайта я выпил 5 литров чая</div>
-                <div class="fact-item"><strong>Факт 2:</strong> за время создания я прослушал весь свой плейлист...</div>
-                <div class="fact-item"><strong>Факт 3:</strong> я буду обновлять сайт, так что не потеряйте его</div>
-                <div class="fact-item"><strong>Факт 4:</strong> хост на картошке</div>
-                <div class="fact-item"><strong>Факт 5:</strong> сус вылазь там радиация</div>
-                <div class="fact-item"><strong>Факт 6:</strong> я уже красный</div>
-                <div class="fact-item"><strong>Факт 7:</strong> а вы знали что github pages платный?</div>
-                <div class="fact-item"><strong>Факт 8:</strong> бобр курва я пердоле</div>
-            </div>
-            <div class="profile-card">
-                <h3 style="color:#d4a5ff; margin-bottom:1rem;">Работа над проектом</h3>
-                <p><strong>Даты:</strong> 9–16 апреля 2026 (сикс-севен дней)</p>
-                <p><strong>Роль:</strong> веб разраб, дизайнер, ну и там еще че то</p>
+            <div class="spacer"></div>
+            <div class="panel-item" data-tab="profile">
+                <div class="panel-icon">⦿</div>
+                <div class="panel-text" data-i18n="profileLabel">ПРОФИЛЬ</div>
             </div>
         </div>
     </div>
-</div>
+    <div class="dim-overlay"></div>
 
-<script>
-    // Погодные данные
-    const weatherData = [
-        { date: "9 апреля", tempDay: "+8", tempNight: "+2", pressure: 760, windDir: "З", windSpeed: 4.5, clouds: "Переменная", rain: "Без осадков", humidity: 65 },
-        { date: "10 апреля", tempDay: "+9", tempNight: "+3", pressure: 758, windDir: "Ю-З", windSpeed: 5.2, clouds: "Облачно", rain: "Небольшой дождь", humidity: 72 },
-        { date: "11 апреля", tempDay: "+7", tempNight: "+2", pressure: 755, windDir: "С-З", windSpeed: 6.0, clouds: "Пасмурно", rain: "Дождь", humidity: 80 },
-        { date: "12 апреля", tempDay: "+6", tempNight: "0", pressure: 762, windDir: "С", windSpeed: 4.8, clouds: "Малооблачно", rain: "Без осадков", humidity: 55 },
-        { date: "13 апреля", tempDay: "+8", tempNight: "+1", pressure: 764, windDir: "С-В", windSpeed: 3.5, clouds: "Солнечно", rain: "Без осадков", humidity: 50 },
-        { date: "14 апреля", tempDay: "+10", tempNight: "+3", pressure: 761, windDir: "В", windSpeed: 4.2, clouds: "Малооблачно", rain: "Без осадков", humidity: 58 },
-        { date: "15 апреля", tempDay: "+11", tempNight: "+4", pressure: 758, windDir: "Ю-В", windSpeed: 5.5, clouds: "Облачно", rain: "Без осадков", humidity: 62 },
-        { date: "16 апреля", tempDay: "+10", tempNight: "+5", pressure: 754, windDir: "Ю", windSpeed: 6.3, clouds: "Пасмурно", rain: "Небольшой дождь", humidity: 75 }
-    ];
+    
+    <div class="top-controls">
+        <div class="lang-switch" id="langToggleBtn">
+            <span class="lang-icon">🌐</span>
+            <span class="lang-text" id="langIndicator">RU</span>
+        </div>
+        <div class="home-cross" id="homeCrossBtn">✕</div>
+    </div>
 
-    const cardsContainer = document.getElementById('weatherCards');
-    function buildWeatherCards() {
-        cardsContainer.innerHTML = '';
-        weatherData.forEach(day => {
-            const card = document.createElement('div');
-            card.className = 'weather-card';
-            card.innerHTML = `
-                <h3>${day.date}</h3>
-                <p><span class="label">Температура днём:</span><span class="value">${day.tempDay}°C</span></p>
-                <p><span class="label">Температура ночью:</span><span class="value">${day.tempNight}°C</span></p>
-                <p><span class="label">Давление:</span><span class="value">${day.pressure} мм</span></p>
-                <p><span class="label">Направление ветра:</span><span class="value">${day.windDir}</span></p>
-                <p><span class="label">Скорость ветра:</span><span class="value">${day.windSpeed} м/с</span></p>
-                <p><span class="label">Облачность:</span><span class="value">${day.clouds}</span></p>
-                <p><span class="label">Осадки:</span><span class="value">${day.rain}</span></p>
-                <p><span class="label">Влажность:</span><span class="value">${day.humidity}%</span></p>
-            `;
-            cardsContainer.appendChild(card);
-        });
-    }
-    buildWeatherCards();
+    
+    <div class="main-container">
+        <div id="dynamicWord">BURMALDASITE</div>
 
-    // Анимация заголовка
-    const titleEl = document.getElementById('dynamicWord');
-    let animationInterval = null, animationTimeout = null;
-    let isCycling = true;
+        
+        <div id="geoContent" class="tab-content hidden">
+            <div class="geo-empty">
+                <div class="sad-emoji">😢</div>
+                <div class="geo-empty-text" data-i18n="geoEmptyText">здесь пока ничего нет...</div>
+                <div class="geo-empty-dots"><span></span><span></span><span></span></div>
+            </div>
+        </div>
 
-    const phases = [
-        { type: 'random', duration: 700 },
-        { type: 'fixed', text: 'данные брал с какого то сайта, так как всего не было на одном, я тут не причем' },
-        { type: 'random', duration: 700 },
-        { type: 'fixed', text: 'работай мой родненький чат джбт' },
-        { type: 'random', duration: 700 },
-        { type: 'fixed', text: 'смотря какой fabric' },
-        { type: 'random', duration: 700 },
-        { type: 'fixed', text: 'я это делал неделю..' }
-    ];
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%^&*()";
-    function randomString(len = 12) {
-        let out = '';
-        for (let i = 0; i < len; i++) out += chars[Math.floor(Math.random() * chars.length)];
-        return out;
-    }
-    function stopAnimation() {
-        if (animationInterval) { clearInterval(animationInterval); animationInterval = null; }
-        if (animationTimeout) { clearTimeout(animationTimeout); animationTimeout = null; }
-    }
-    function startRandomPhase(duration, next) {
-        stopAnimation();
-        animationInterval = setInterval(() => { if (isCycling) titleEl.innerText = randomString(12); }, 90);
-        animationTimeout = setTimeout(() => {
-            if (animationInterval) clearInterval(animationInterval);
-            animationInterval = null;
-            next();
-        }, duration);
-    }
-    function showFixedText(text, next) {
-        stopAnimation();
-        titleEl.innerText = text;
-        animationTimeout = setTimeout(() => { next(); }, 1800);
-    }
-    function runCycle(index) {
-        if (!isCycling) return;
-        if (index >= phases.length) { runCycle(0); return; }
-        const p = phases[index];
-        if (p.type === 'random') startRandomPhase(p.duration, () => runCycle(index + 1));
-        else showFixedText(p.text, () => runCycle(index + 1));
-    }
-    function startMainCycle() {
-        isCycling = true;
-        let chaosCount = 0;
-        const chaosInt = setInterval(() => {
-            if (isCycling) titleEl.innerText = randomString(12);
-            chaosCount++;
-            if (chaosCount > 12) { clearInterval(chaosInt); runCycle(0); }
-        }, 90);
-    }
-    function setStaticTitle(text) {
-        if (isCycling === true) { isCycling = false; stopAnimation(); }
-        titleEl.innerText = text;
-    }
-    function resetToCycling() {
-        if (isCycling === false) { isCycling = true; stopAnimation(); startMainCycle(); }
-    }
+        
+        <div id="engContent" class="tab-content hidden">
+            <div id="oceanFullContainer" class="ocean-full-slide"></div>
+        </div>
 
-    // Частицы
-    const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
-    let w = window.innerWidth, h = window.innerHeight;
-    let particles = [];
-    function resizeCanvas() { w = window.innerWidth; h = window.innerHeight; canvas.width = w; canvas.height = h; }
-    class ParticleV {
-        constructor() {
-            this.x = Math.random() * w;
-            this.y = Math.random() * h;
-            this.size = Math.random() * 5 + 2;
-            this.speedX = (Math.random() - 0.5) * 0.7;
-            this.speedY = (Math.random() - 0.5) * 0.5 - 0.2;
-            this.opacity = Math.random() * 0.6 + 0.2;
-            this.color = `rgba(170, 100, 255, ${this.opacity})`;
-        }
-        update() {
-            this.x += this.speedX;
-            this.y += this.speedY;
-            if (this.x < 0) this.x = w;
-            if (this.x > w) this.x = 0;
-            if (this.y < 0) this.y = h;
-            if (this.y > h) this.y = 0;
-        }
-        draw() {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fillStyle = this.color;
-            ctx.shadowBlur = 14;
-            ctx.shadowColor = "#b56eff";
-            ctx.fill();
-        }
-    }
-    function initParticles(count) {
-        particles = [];
-        for (let i = 0; i < count; i++) particles.push(new ParticleV());
-    }
-    function animateParticles() {
-        ctx.clearRect(0, 0, w, h);
-        for (let p of particles) { p.update(); p.draw(); }
-        requestAnimationFrame(animateParticles);
-    }
-    window.addEventListener('resize', () => { resizeCanvas(); initParticles(130); });
-    resizeCanvas();
-    initParticles(130);
-    animateParticles();
+        
+        <div id="profileContent" class="tab-content hidden">
+            <div class="profile-slides" id="profileSlidesContainer"></div>
+        </div>
+    </div>
 
-    // Управление вкладками
-    const geoBtn = document.getElementById('geoPanelBtn');
-    const engBtn = document.getElementById('engPanelBtn');
-    const profileBtn = document.getElementById('profilePanelBtn');
-    const homeCross = document.getElementById('homeCrossBtn');
-    const geoContent = document.getElementById('geoContent');
-    const engContent = document.getElementById('engContent');
-    const profileContent = document.getElementById('profileContent');
-    const page1Btn = document.getElementById('page1Btn');
-    const page2Btn = document.getElementById('page2Btn');
-    const engPage1 = document.getElementById('engPage1');
-    const engPage2 = document.getElementById('engPage2');
 
-    function hideAllTabs() {
-        geoContent.classList.add('hidden');
-        engContent.classList.add('hidden');
-        profileContent.classList.add('hidden');
-    }
+    <script>
+        (function() {
+            // ── DOM-элементы ──────────────────────────────
+            const titleEl = document.getElementById('dynamicWord');
+            const geoContent = document.getElementById('geoContent');
+            const engContent = document.getElementById('engContent');
+            const oceanFullContainer = document.getElementById('oceanFullContainer');
+            const profileContent = document.getElementById('profileContent');
+            const profileSlidesContainer = document.getElementById('profileSlidesContainer');
+            const langToggleBtn = document.getElementById('langToggleBtn');
+            const langIndicator = document.getElementById('langIndicator');
+            const homeCrossBtn = document.getElementById('homeCrossBtn');
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
 
-    geoBtn.addEventListener('click', () => {
-        hideAllTabs();
-        geoContent.classList.remove('hidden');
-        setStaticTitle('ПОГОДА');
-    });
+            
+            let currentLang = localStorage.getItem('lang') || 'ru';
+            let currentTab = localStorage.getItem('tab') || null;
+            let animationActive = true;
+            let animInterval = null,
+                animTimeout = null;
+            let particles = [],
+                w, h, rafId = null;
+            let mouseX = -200,
+                mouseY = -200;
 
-    engBtn.addEventListener('click', () => {
-        hideAllTabs();
-        engContent.classList.remove('hidden');
-        setStaticTitle('RED NOSE DAY');
-        engPage1.classList.remove('hidden-page');
-        engPage2.classList.add('hidden-page');
-    });
+            const t = {
+                ru: {
+                    geoLabel: 'ГЕОГРАФИЯ',
+                    engLabel: 'ОКЕАН',
+                    profileLabel: 'ПРОФИЛЬ',
+                    geoEmptyText: 'здесь пока ничего нет...',
+                    backBtn: '← НА ГЛАВНУЮ',
+                    weatherTitle: 'ПОГОДА',
+                    oceanTitle: 'ФАКТЫ ПРО ОКЕАН',
+                    oceanIntro: 'Мировой океан покрывает более 70% поверхности Земли и скрывает невероятные тайны. Вот пять фактов.',
+                    fact1Title: 'Кислород от планктона',
+                    fact1Text: 'Фитопланктон — крошечные водоросли — производит от 50% до 80% всего кислорода на Земле. Они вырабатывают больше кислорода, чем все леса мира вместе взятые, и являются основой морской пищевой цепи.',
+                    fact2Title: 'Марианская впадина',
+                    fact2Text: 'Самое глубокое место на планете — 11 034 метра. Если бросить камень, он будет падать больше часа, прежде чем достигнет дна. Давление там в 1000 раз выше, чем на поверхности.',
+                    fact3Title: 'Подводные реки',
+                    fact3Text: 'На дне океана существуют настоящие реки и озёра из сверхсолёной воды. Они текут по своим руслам, образуя берега и даже водопады под водой.',
+                    fact4Title: 'Золото в воде',
+                    fact4Text: 'В водах Мирового океана растворено около 20 миллионов тонн золота. К сожалению, оно настолько рассеяно, что добывать его пока нерентабельно.',
+                    fact5Title: '91% видов не открыты',
+                    fact5Text: 'По оценкам учёных, мы изучили лишь 9% океанских глубин. Океан остаётся менее исследованным, чем поверхность Марса или Луны.',
+                    profileTitle: 'ПРОФИЛЬ',
+                    profileNick: '0xInlate',
+                    factsTitle: 'Интересные факты',
+                    projectTitle: 'Работа над проектом',
+                    projectDates: '? - 6 майа 2026',
+                    projectRole: 'пастер какой та',
+                    facts: [
+                        'за время создания сайта я выпил 5 литров чая (не актуально)',
+                        'прослушал весь свой плейлист... (не актуально)',
+                        'я буду обновлять сайт (актуально)',
+                        'хост на картошке',
+                        'сус вылазь там радиация (не актуально)',
+                        'я уже красный (не актуально)',
+                        'github pages платный? (не актуально)',
+                        'бобр ку##а я пе###е (осуждаю)'
+                    ]
+                },
+                en: {
+                    geoLabel: 'GEOGRAPHY',
+                    engLabel: 'OCEAN',
+                    profileLabel: 'PROFILE',
+                    geoEmptyText: 'nothing here yet...',
+                    backBtn: '← BACK HOME',
+                    weatherTitle: 'WEATHER',
+                    oceanTitle: 'OCEAN FACTS',
+                    oceanIntro: 'The world ocean covers over 70% of the Earth\'s surface and hides incredible secrets. Here are five mind-blowing facts.',
+                    fact1Title: 'Plankton Oxygen',
+                    fact1Text: 'Phytoplankton — tiny algae — produce 50% to 80% of all oxygen on Earth. They generate more oxygen than all the world\'s forests combined and form the base of the marine food web.',
+                    fact2Title: 'Mariana Trench',
+                    fact2Text: 'The deepest spot on the planet at 11,034 meters. A stone dropped into it would take over an hour to reach the bottom. The pressure there is 1,000 times greater than at the surface.',
+                    fact3Title: 'Underwater Rivers',
+                    fact3Text: 'Real rivers and lakes of super-salty brine flow along the ocean floor, complete with their own riverbanks and even underwater waterfalls.',
+                    fact4Title: 'Gold in Water',
+                    fact4Text: 'About 20 million tons of gold are dissolved in the world\'s oceans. Unfortunately, it is so diluted that extracting it is not yet profitable.',
+                    fact5Title: '91% Unknown',
+                    fact5Text: 'Scientists estimate we have explored only 9% of the ocean depths. The ocean remains less mapped than the surface of Mars or the Moon.',
+                    profileTitle: 'PROFILE',
+                    profileNick: '0xInlate',
+                    factsTitle: 'Fun Facts',
+                    projectTitle: 'Project',
+                    projectDates: 'may ? – 6, 2026',
+                    projectRole: 'pastocode',
+                    facts: [
+                        'drank 5L tea  (не актуально)',
+                        'listened whole playlist (не актуально)',
+                        'will update site (актуально)',
+                        'hosted on potato',
+                        'radiation outside (не актуально)',
+                        'already red (не актуально)',
+                        'github pages paid? (не актуально)',
+                        'beaver curse (не актуально)'
+                    ]
+                }
+            };
 
-    profileBtn.addEventListener('click', () => {
-        hideAllTabs();
-        profileContent.classList.remove('hidden');
-        setStaticTitle('ПРОФИЛЬ');
-    });
+            function tr(key) { return t[currentLang] && t[currentLang][key] ? t[currentLang][key] : key; }
 
-    homeCross.addEventListener('click', () => {
-        hideAllTabs();
-        resetToCycling();
-    });
+            
+            function updateI18n() {
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const k = el.getAttribute('data-i18n');
+                    if (t[currentLang] && t[currentLang][k]) el.innerText = t[currentLang][k];
+                });
+                langIndicator.innerText = currentLang.toUpperCase();
+                buildProfileSlides();
+                updateTitleForCurrentState();
+                if (currentTab === 'eng') buildOceanFullPage();
+                localStorage.setItem('lang', currentLang);
+            }
 
-    page1Btn.addEventListener('click', () => {
-        engPage1.classList.remove('hidden-page');
-        engPage2.classList.add('hidden-page');
-    });
-    page2Btn.addEventListener('click', () => {
-        engPage2.classList.remove('hidden-page');
-        engPage1.classList.add('hidden-page');
-    });
+            function updateTitleForCurrentState() {
+                if (currentTab === 'geo') setStaticTitle(tr('weatherTitle'));
+                else if (currentTab === 'eng') setStaticTitle(tr('oceanTitle'));
+                else if (currentTab === 'profile') setStaticTitle(tr('profileTitle'));
+                else setStaticTitle('BURMALDASITE');
+            }
 
-    startMainCycle();
-    hideAllTabs();
-</script>
+            
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%^&*()';
+            const phases = [
+                { type: 'random', dur: 700 },
+                { type: 'fixed', text: 'data taken from various sites' },
+                { type: 'random', dur: 700 },
+                { type: 'fixed', text: 'work my dear chatgpt' },
+                { type: 'random', dur: 700 },
+                { type: 'fixed', text: 'depends which fabric' },
+                { type: 'random', dur: 700 },
+                { type: 'fixed', text: 'i did this for a week..' }
+            ];
+
+            function randStr(l = 12) {
+                let s = '';
+                for (let i = 0; i < l; i++) s += chars[Math.floor(Math.random() * chars.length)];
+                return s;
+            }
+
+            function stopAnim() {
+                if (animInterval) clearInterval(animInterval);
+                if (animTimeout) clearTimeout(animTimeout);
+                animInterval = null;
+                animTimeout = null;
+            }
+
+            function startRandomPhase(dur, next) {
+                stopAnim();
+                animInterval = setInterval(() => {
+                    if (animationActive) titleEl.innerText = randStr(12);
+                }, 80);
+                animTimeout = setTimeout(() => {
+                    if (animInterval) clearInterval(animInterval);
+                    animInterval = null;
+                    next();
+                }, dur);
+            }
+
+            function showFixed(text, next) {
+                stopAnim();
+                titleEl.innerText = text;
+                animTimeout = setTimeout(next, 1800);
+            }
+
+            function runCycle(i) {
+                if (!animationActive) return;
+                if (i >= phases.length) { runCycle(0); return; }
+                const p = phases[i];
+                if (p.type === 'random') startRandomPhase(p.dur, () => runCycle(i + 1));
+                else showFixed(p.text, () => runCycle(i + 1));
+            }
+
+            function startMainCycle() {
+                animationActive = true;
+                let c = 0;
+                const int = setInterval(() => {
+                    if (animationActive) titleEl.innerText = randStr(12);
+                    c++;
+                    if (c > 12) { clearInterval(int);
+                        runCycle(0); }
+                }, 90);
+            }
+
+            function setStaticTitle(text) {
+                if (animationActive) { animationActive = false;
+                    stopAnim(); }
+                titleEl.innerText = text;
+            }
+
+            function resetToCycling() {
+                if (!animationActive) { animationActive = true;
+                    stopAnim();
+                    startMainCycle(); }
+            }
+
+            // Случайный глитч
+            setInterval(() => {
+                if (Math.random() < 0.25 && animationActive) {
+                    titleEl.classList.add('glitch-heavy');
+                    setTimeout(() => titleEl.classList.remove('glitch-heavy'), 400);
+                }
+            }, 8000);
+
+            
+            function initParticles(count) {
+                particles = [];
+                for (let i = 0; i < count; i++) particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    size: Math.random() * 4 + 1.2,
+                    sx: (Math.random() - 0.5) * 0.5,
+                    sy: (Math.random() - 0.5) * 0.4 - 0.12,
+                    opacity: Math.random() * 0.5 + 0.2,
+                    hue: 190 + Math.random() * 40
+                });
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, w, h);
+                const mx = mouseX,
+                    my = mouseY;
+                for (let p of particles) {
+                    p.x += p.sx;
+                    p.y += p.sy;
+                    if (p.x < -10) p.x = w + 10;
+                    if (p.x > w + 10) p.x = -10;
+                    if (p.y < -10) p.y = h + 10;
+                    if (p.y > h + 10) p.y = -10;
+                    const dx = mx - p.x,
+                        dy = my - p.y,
+                        dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 180 && dist > 0) {
+                        const force = 0.012;
+                        p.sx += (dx / dist) * force;
+                        p.sy += (dy / dist) * force;
+                        p.sx *= 0.98;
+                        p.sy *= 0.98;
+                    }
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsla(${p.hue},70%,65%,${p.opacity})`;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = `hsla(${p.hue},80%,55%,0.45)`;
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+                rafId = requestAnimationFrame(drawParticles);
+            }
+
+            function resizeCanvas() {
+                w = window.innerWidth;
+                h = window.innerHeight;
+                canvas.width = w;
+                canvas.height = h;
+                const density = w * h / 11000;
+                const count = Math.min(100, Math.max(30, Math.floor(density)));
+                initParticles(count);
+            }
+            let resizeDebounce;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeDebounce);
+                resizeDebounce = setTimeout(resizeCanvas, 200);
+            });
+            document.addEventListener('mousemove', e => { mouseX = e.clientX;
+                mouseY = e.clientY; });
+            document.addEventListener('touchmove', e => {
+                if (e.touches.length) { mouseX = e.touches[0].clientX;
+                    mouseY = e.touches[0].clientY; }
+            }, { passive: true });
+
+            
+            function addRipple(e, el) {
+                const rect = el.getBoundingClientRect(),
+                    ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                const size = Math.max(rect.width, rect.height) * 1.5;
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                el.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            }
+
+           
+            function hideAllTabs() {
+                [geoContent, engContent, profileContent].forEach(c => c.classList.add('hidden'));
+                currentTab = null;
+                localStorage.removeItem('tab');
+                resetToCycling();
+            }
+
+            function switchTab(tabId) {
+                hideAllTabs();
+                currentTab = tabId;
+                localStorage.setItem('tab', tabId);
+                if (tabId === 'geo') {
+                    geoContent.classList.remove('hidden');
+                    setStaticTitle(tr('weatherTitle'));
+                } else if (tabId === 'eng') {
+                    engContent.classList.remove('hidden');
+                    buildOceanFullPage();
+                    setStaticTitle(tr('oceanTitle'));
+                } else if (tabId === 'profile') {
+                    profileContent.classList.remove('hidden');
+                    buildProfileSlides();
+                    setStaticTitle(tr('profileTitle'));
+                }
+            }
+
+            
+            function buildOceanFullPage() {
+                oceanFullContainer.innerHTML = `
+                    <!-- ПРОМТ: Aerial view of deep blue ocean surface with sunlight penetrating the water, visible light rays descending into the dark abyss, cinematic atmosphere, photorealistic 1024x400 -->
+                    <div class="ocean-banner" data-img="ocean-banner"><span>🖼️ ocean banner</span></div>
+                    <h2>${tr('oceanTitle')}</h2>
+                    <p class="ocean-intro">${tr('oceanIntro')}</p>
+                    <div class="ocean-facts-grid">
+                        <div class="ocean-fact-card">
+                            <div class="fact-num">01</div>
+                            <h3>${tr('fact1Title')}</h3>
+                            <p>${tr('fact1Text')}</p>
+                            <div class="fact-img-slot" data-img="ocean1"><span>🖼️ phytoplankton</span></div>
+                        </div>
+                        <div class="ocean-fact-card">
+                            <div class="fact-num">02</div>
+                            <h3>${tr('fact2Title')}</h3>
+                            <p>${tr('fact2Text')}</p>
+                            <div class="fact-img-slot" data-img="ocean2"><span>🖼️ mariana trench</span></div>
+                        </div>
+                        <div class="ocean-fact-card">
+                            <div class="fact-num">03</div>
+                            <h3>${tr('fact3Title')}</h3>
+                            <p>${tr('fact3Text')}</p>
+                            <div class="fact-img-slot" data-img="ocean3"><span>🖼️ underwater river</span></div>
+                        </div>
+                        <div class="ocean-fact-card">
+                            <div class="fact-num">04</div>
+                            <h3>${tr('fact4Title')}</h3>
+                            <p>${tr('fact4Text')}</p>
+                            <div class="fact-img-slot" data-img="ocean4"><span>🖼️ gold in water</span></div>
+                        </div>
+                        <div class="ocean-fact-card">
+                            <div class="fact-num">05</div>
+                            <h3>${tr('fact5Title')}</h3>
+                            <p>${tr('fact5Text')}</p>
+                            <div class="fact-img-slot" data-img="ocean5"><span>🖼️ deep sea creatures</span></div>
+                        </div>
+                    </div>
+                    <button class="back-btn" data-back>${tr('backBtn')}</button>
+                `;
+                loadOceanImages();
+                
+                requestAnimationFrame(() => revealCardsOnScroll());
+            }
+
+            function revealCardsOnScroll() {
+                const cards = oceanFullContainer.querySelectorAll('.ocean-fact-card');
+                if (!cards.length) return;
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.2, root: oceanFullContainer });
+                cards.forEach(card => observer.observe(card));
+            }
+
+            // ── Загрузка изображений океана ──────────────
+            function loadOceanImages() {
+                const imgMap = {
+                    'ocean-banner': 'assets/image/1.png',
+                    ocean1: 'assets/image/2.png',
+                    ocean2: 'assets/image/3.png',
+                    ocean3: 'assets/image/4.png',
+                    ocean4: 'assets/image/5.png',
+                    ocean5: 'assets/image/6.png'
+                };
+                document.querySelectorAll('#oceanFullContainer [data-img]').forEach(slot => {
+                    const key = slot.getAttribute('data-img');
+                    if (imgMap[key] && !slot.querySelector('img')) {
+                        const img = document.createElement('img');
+                        img.src = imgMap[key];
+                        img.loading = 'lazy';
+                        img.alt = key;
+                        img.onload = () => {
+                            const placeholder = slot.querySelector('span');
+                            if (placeholder) placeholder.style.display = 'none';
+                        };
+                        img.onerror = () => {
+                            const placeholder = slot.querySelector('span');
+                            if (placeholder) placeholder.style.display = '';
+                        };
+                        slot.appendChild(img);
+                    }
+                });
+            }
+
+            
+            function buildProfileSlides() {
+                profileSlidesContainer.style.scrollSnapType = 'x mandatory';
+                profileSlidesContainer.innerHTML = `
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <img src="assets/image/ava.png"
+                            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%230a1a2e%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%230080dd%22 font-size=%2220%22%3E0x%3C/text%3E%3C/svg%3E'"
+                            alt="avatar">
+                        </div>
+                        <div class="profile-nick">${tr('profileNick')}</div>
+                    </div>
+                    <div class="profile-card" style="width:350px;">
+                        <h3 style="color:#99d6ff;">${tr('factsTitle')}</h3>
+                        ${t[currentLang].facts.map((f, i) => `<div class="fact-item"><strong>${currentLang === 'ru' ? 'Факт' : 'Fact'} ${i + 1}:</strong> ${f}</div>`).join('')}
+                    </div>
+                    <div class="profile-card" style="width:300px;">
+                        <h3 style="color:#99d6ff;">${tr('projectTitle')}</h3>
+                        <p style="text-align:center;line-height:1.5;"><strong>${currentLang === 'ru' ? 'Даты:' : 'Dates:'}</strong> ${tr('projectDates')}</p>
+                        <p style="text-align:center;line-height:1.5;"><strong>${currentLang === 'ru' ? 'Роль:' : 'Role:'}</strong> ${tr('projectRole')}</p>
+                    </div>`;
+            }
+
+            
+            document.addEventListener('click', e => {
+                const btn = e.target.closest('.panel-item');
+                if (btn) {
+                    const tab = btn.getAttribute('data-tab');
+                    if (tab) switchTab(tab);
+                    addRipple(e, btn);
+                    return;
+                }
+                const backBtn = e.target.closest('[data-back]');
+                if (backBtn) {
+                    hideAllTabs();
+                    addRipple(e, backBtn);
+                    return;
+                }
+                if (e.target.closest('#langToggleBtn')) {
+                    currentLang = currentLang === 'ru' ? 'en' : 'ru';
+                    updateI18n();
+                    addRipple(e, langToggleBtn);
+                    return;
+                }
+                if (e.target.closest('#homeCrossBtn')) {
+                    hideAllTabs();
+                    addRipple(e, homeCrossBtn);
+                    return;
+                }
+                const anyBtn = e.target.closest('button, .panel-item, .lang-switch, .home-cross');
+                if (anyBtn && !e.target.closest('[data-back]') && !e.target.closest('.panel-item')) {
+                    addRipple(e, anyBtn);
+                }
+            });
+
+            
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE = 'burmalda-ocean-v1';
+                    const ASSETS = ['/','index.html','assets/mine.ttf','assets/image/ava.png'];
+                    self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{}))));
+                    self.addEventListener('fetch', e => e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).then(res => { if(res && res.ok){ const clone = res.clone(); caches.open(CACHE).then(c => c.put(e.request, clone)); } return res; }).catch(() => caches.match(e.request)))));
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+            }
+
+            
+            resizeCanvas();
+            drawParticles();
+            updateI18n();
+            startMainCycle();
+
+            
+            if (currentTab) {
+                switchTab(currentTab);
+            } else {
+                hideAllTabs();
+            }
+        })();
+    </script>
 </body>
 </html>
